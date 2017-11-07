@@ -62,13 +62,14 @@
 			position: this.location,
 			map: this.map,
 			optimized: false,
+			zIndex: 0,
 			icon: {
 				url: "/assets/location-marker.svg",
 				anchor: new google.maps.Point(50, 50)
 			}
 		});
 
-		this.getNotes();
+		setTimeout(() => this.getNotes(), 250);
 	}
 
 	createMarker(note) {
@@ -92,11 +93,9 @@
 	}
 
 	createMarkers(notes) {
-		const initialDelay = 250;
-
 		for (let i = 0; i < notes.length; i++) {
 			const note = notes[i];
-			const delay = initialDelay + i * 50;
+			const delay = 250 + i * 25;
 
 			setTimeout(() => this.createMarker(note), delay);
 		}
