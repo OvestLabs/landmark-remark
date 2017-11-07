@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using LandmarkRemark.Models;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 namespace LandmarkRemark
@@ -7,6 +8,11 @@ namespace LandmarkRemark
 	{
 		public static void Main(string[] args)
 		{
+			using (var db = new NoteContext())
+			{
+				db.Database.EnsureCreated();
+			}
+
 			BuildWebHost(args).Run();
 		}
 

@@ -10,3 +10,16 @@ html, body {
 .fullHeight {
 	height: 100%;
 }
+
+#app {
+	position: relative;
+}
+
+.menu {
+	position: absolute;
+	width: 80%;
+	bottom: 20px;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
