@@ -13,6 +13,7 @@ namespace LandmarkRemark
 	{
 		private static void ConfigureReact(IReactSiteConfiguration config)
 		{
+			config.AddScript("~/js/Menu.jsx");
 			config.AddScript("~/js/App.jsx");
 		}
 

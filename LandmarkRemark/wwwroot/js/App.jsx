@@ -9,12 +9,11 @@
 		const melbourne = { lat: -37.811263, lng: 144.963151 };
 		this.location = melbourne;
 
-		this.handleTextChange = this.handleTextChange.bind(this);
-		this.handleKeyUp = this.handleKeyUp.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleLocationError = this.handleLocationError.bind(this);
 		this.handleMarkerMove = this.handleMarkerMove.bind(this);
 		this.handleMarkerClick = this.handleMarkerClick.bind(this);
+		this.handleCreateNote = this.handleCreateNote.bind(this);
 	}
 
 	componentDidMount() {
@@ -128,21 +127,15 @@
 			.catch(error => console.error(error));
 	}
 
-	submitNote(position, remarks) {
+	submitNote(note) {
 		const url = "/notes";
-		const payload = {
-			latitude: position.lat,
-			longitude: position.lng,
-			remarks: remarks
-		};
-
 		const options = {
 			method: "POST",
 			headers: {
 				Accept: "application/json, text/plain, */*",
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify(payload)
+			body: JSON.stringify(note)
 		};
 
 		console.log(options);
@@ -210,36 +203,18 @@
 		this.infoWindow.open(this.map, marker);
 	}
 
-	handleTextChange(e) {
-		const newText = e.currentTarget.value;
+	handleCreateNote(note) {
+		note.latitude = this.location.lat;
+		note.longitude = this.location.lng;
 
-		this.setState({
-			text: newText
-		});
-	}
-
-	handleKeyUp(e) {
-		if (e.key !== "Enter") {
-			return;
-		}
-
-		e.currentTarget.blur();
-
-		this.submitNote(this.location, this.state.text);
+		this.submitNote(note);
 	}
 
 	render() {
 		return (
 			<div className="fullHeight">
 				<div className="fullHeight"></div>
-				<div className="menu">
-					<input
-						type="text"
-						value={this.state.text}
-						onChange={this.handleTextChange}
-						onKeyUp={this.handleKeyUp}
-						placeholder="enter note here..." />
-				</div>
+				<Menu onCreateNote={this.handleCreateNote} />
 			</div>
 		);
 	}
