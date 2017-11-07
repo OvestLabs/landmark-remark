@@ -92,9 +92,13 @@
 	}
 
 	createMarkers(notes) {
+		const initialDelay = 250;
+
 		for (let i = 0; i < notes.length; i++) {
 			const note = notes[i];
-			this.createMarker(note);
+			const delay = initialDelay + i * 50;
+
+			setTimeout(() => this.createMarker(note), delay);
 		}
 	}
 
