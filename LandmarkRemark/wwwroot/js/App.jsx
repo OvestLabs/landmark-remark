@@ -36,23 +36,33 @@
 			zoom: 15
 		};
 
-		const map = new google.maps.Map(container, options);
-		const marker = new google.maps.Marker({
+		this.map = new google.maps.Map(container, options);
+		this.locationMarker = new google.maps.Marker({
 			position: this.location,
-			map: map
+			map: this.map,
+			optimized: false,
+			icon: {
+				url: "/assets/location-marker.svg",
+				anchor: new google.maps.Point(50,50)
+			}
 		});
 	}
 
-	submitNote(location, note) {
+	createMarker(position) {
+		const marker = new google.maps.Marker({
+			position: position,
+			map: this.map,
+			animation: google.maps.Animation.DROP
+		});
+	}
+
+	submitNote(position, note) {
 		const url = "/notes";
 		const payload = {
-			latitude: location.lat,
-			longitude: location.lng,
+			latitude: position.lat,
+			longitude: position.lng,
 			remarks: note
 		};
-
-		//const data = new FormData();
-		//data.append("json", JSON.stringify(payload));
 
 		const options = {
 			method: "POST",
@@ -66,9 +76,11 @@
 		console.log(options);
 
 		fetch(url, options)
-			.then(response => { })
-			.catch(error => console.error(error))
-		;
+			.then(response => {
+				console.log(response);
+				this.createMarker(position);
+			})
+			.catch(error => console.error(error));
 	}
 
 	handleTextChange(e) {
