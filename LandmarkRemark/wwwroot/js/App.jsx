@@ -48,7 +48,7 @@
 		const payload = {
 			latitude: location.lat,
 			longitude: location.lng,
-			remark: note
+			remarks: note
 		};
 
 		//const data = new FormData();

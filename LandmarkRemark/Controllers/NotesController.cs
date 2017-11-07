@@ -6,7 +6,7 @@ namespace LandmarkRemark.Controllers
 	public class NotesController : Controller
 	{
 		[HttpPost]
-		public void Index(UserNote note)
+		public void Index([FromBody] UserNote note)
 		{
 
 		}
