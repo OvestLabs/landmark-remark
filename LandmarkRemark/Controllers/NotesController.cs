@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LandmarkRemark.Models;
@@ -9,6 +10,19 @@ namespace LandmarkRemark.Controllers
 {
 	public class NotesController : Controller
 	{
+		[HttpGet]
+		public async Task<JsonResult> Index()
+		{
+			List<UserNote> notes;
+
+			using (var db = new NoteContext())
+			{
+				notes = await db.Notes.ToListAsync();
+			}
+
+			return Json(notes);
+		}
+
 		[HttpPost]
 		public async Task<IActionResult> Index([FromBody] UserNote note)
 		{
