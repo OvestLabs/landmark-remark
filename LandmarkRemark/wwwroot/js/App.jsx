@@ -69,7 +69,13 @@
 		});
 	}
 
-	createMarker(position) {
+	createMarker(note) {
+		console.log(note);
+
+		const position = {
+			lat: note.latitude,
+			lng: note.longitude
+		};
 		const marker = new google.maps.Marker({
 			position: position,
 			map: this.map,
@@ -77,15 +83,20 @@
 			draggable: true
 		});
 
-		google.maps.event.addListener(marker, "dragend", this.handleMarkerMove);
+		marker.note = note;
+
+		const dragHandler = this.handleMarkerMove;
+		google.maps.event.addListener(marker, "dragend", function (e) {
+			dragHandler(marker, e);
+		});
 	}
 
-	submitNote(position, note) {
+	submitNote(position, remarks) {
 		const url = "/notes";
 		const payload = {
 			latitude: position.lat,
 			longitude: position.lng,
-			remarks: note
+			remarks: remarks
 		};
 
 		const options = {
@@ -102,7 +113,32 @@
 		fetch(url, options)
 			.then(response => {
 				console.log(response);
-				this.createMarker(position);
+				//console.log(response.headers.get("location"));
+				//response.headers.forEach((v, k) => console.log(k, v));
+				return response.json();
+			})
+			.then(json => this.createMarker(json))
+			.catch(error => console.error(error));
+	}
+
+	updateNote(marker, newNote) {
+		const oldNote = marker.note;
+		const url = `/notes/${oldNote.id}`;
+		const options = {
+			method: "PUT",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(newNote)
+		};
+
+		console.log(options);
+
+		fetch(url, options)
+			.then(response => {
+				console.log(response);
+				marker.note = newNote;
 			})
 			.catch(error => console.error(error));
 	}
@@ -121,12 +157,15 @@
 		this.initMap();
 	}
 
-	handleMarkerMove(marker) {
-		const position = marker.latLng;
-		const latitude = position.lat();
-		const longitude = position.lng();
+	handleMarkerMove(marker, e) {
+		const latitude = e.latLng.lat();
+		const longitude = e.latLng.lng();
+		const newNote = Object.assign({}, marker.note);
 
-		console.log(latitude, longitude);
+		newNote.latitude = latitude;
+		newNote.longitude = longitude;
+
+		this.updateNote(marker, newNote);
 	}
 
 	handleTextChange(e) {
