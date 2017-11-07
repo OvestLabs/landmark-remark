@@ -13,6 +13,7 @@
 		this.handleKeyUp = this.handleKeyUp.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleLocationError = this.handleLocationError.bind(this);
+		this.handleMarkerMove = this.handleMarkerMove.bind(this);
 	}
 
 	componentDidMount() {
@@ -72,8 +73,11 @@
 		const marker = new google.maps.Marker({
 			position: position,
 			map: this.map,
-			animation: google.maps.Animation.DROP
+			animation: google.maps.Animation.DROP,
+			draggable: true
 		});
+
+		google.maps.event.addListener(marker, "dragend", this.handleMarkerMove);
 	}
 
 	submitNote(position, note) {
@@ -115,6 +119,14 @@
 	handleLocationError(error) {
 		alert(`Error '${error.code}': ${error.message}`);
 		this.initMap();
+	}
+
+	handleMarkerMove(marker) {
+		const position = marker.latLng;
+		const latitude = position.lat();
+		const longitude = position.lng();
+
+		console.log(latitude, longitude);
 	}
 
 	handleTextChange(e) {
