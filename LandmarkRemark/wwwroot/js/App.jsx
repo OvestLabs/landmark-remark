@@ -13,6 +13,7 @@
 		this.handleKeyUp = this.handleKeyUp.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleLocationError = this.handleLocationError.bind(this);
+		this.handleMarkerMove = this.handleMarkerMove.bind(this);
 	}
 
 	componentDidMount() {
@@ -68,20 +69,34 @@
 		});
 	}
 
-	createMarker(position) {
+	createMarker(note) {
+		console.log(note);
+
+		const position = {
+			lat: note.latitude,
+			lng: note.longitude
+		};
 		const marker = new google.maps.Marker({
 			position: position,
 			map: this.map,
-			animation: google.maps.Animation.DROP
+			animation: google.maps.Animation.DROP,
+			draggable: true
+		});
+
+		marker.note = note;
+
+		const dragHandler = this.handleMarkerMove;
+		google.maps.event.addListener(marker, "dragend", function (e) {
+			dragHandler(marker, e);
 		});
 	}
 
-	submitNote(position, note) {
+	submitNote(position, remarks) {
 		const url = "/notes";
 		const payload = {
 			latitude: position.lat,
 			longitude: position.lng,
-			remarks: note
+			remarks: remarks
 		};
 
 		const options = {
@@ -98,7 +113,32 @@
 		fetch(url, options)
 			.then(response => {
 				console.log(response);
-				this.createMarker(position);
+				//console.log(response.headers.get("location"));
+				//response.headers.forEach((v, k) => console.log(k, v));
+				return response.json();
+			})
+			.then(json => this.createMarker(json))
+			.catch(error => console.error(error));
+	}
+
+	updateNote(marker, newNote) {
+		const oldNote = marker.note;
+		const url = `/notes/${oldNote.id}`;
+		const options = {
+			method: "PUT",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(newNote)
+		};
+
+		console.log(options);
+
+		fetch(url, options)
+			.then(response => {
+				console.log(response);
+				marker.note = newNote;
 			})
 			.catch(error => console.error(error));
 	}
@@ -115,6 +155,17 @@
 	handleLocationError(error) {
 		alert(`Error '${error.code}': ${error.message}`);
 		this.initMap();
+	}
+
+	handleMarkerMove(marker, e) {
+		const latitude = e.latLng.lat();
+		const longitude = e.latLng.lng();
+		const newNote = Object.assign({}, marker.note);
+
+		newNote.latitude = latitude;
+		newNote.longitude = longitude;
+
+		this.updateNote(marker, newNote);
 	}
 
 	handleTextChange(e) {
