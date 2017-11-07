@@ -14,6 +14,7 @@
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleLocationError = this.handleLocationError.bind(this);
 		this.handleMarkerMove = this.handleMarkerMove.bind(this);
+		this.handleMarkerClick = this.handleMarkerClick.bind(this);
 	}
 
 	componentDidMount() {
@@ -58,20 +59,22 @@
 		};
 
 		this.map = new google.maps.Map(container, options);
+		this.infoWindow = new google.maps.InfoWindow();
 		this.locationMarker = new google.maps.Marker({
 			position: this.location,
 			map: this.map,
 			optimized: false,
+			zIndex: 0,
 			icon: {
 				url: "/assets/location-marker.svg",
 				anchor: new google.maps.Point(50, 50)
 			}
 		});
+
+		setTimeout(() => this.getNotes(), 250);
 	}
 
 	createMarker(note) {
-		console.log(note);
-
 		const position = {
 			lat: note.latitude,
 			lng: note.longitude
@@ -86,9 +89,43 @@
 		marker.note = note;
 
 		const dragHandler = this.handleMarkerMove;
+		const clickHandler = this.handleMarkerClick;
+
 		google.maps.event.addListener(marker, "dragend", function (e) {
 			dragHandler(marker, e);
 		});
+
+		google.maps.event.addListener(marker, "click", function(e) {
+			clickHandler(marker, e);
+		});
+	}
+
+	createMarkers(notes) {
+		for (let i = 0; i < notes.length; i++) {
+			const note = notes[i];
+			const delay = 250 + i * 25;
+
+			setTimeout(() => this.createMarker(note), delay);
+		}
+	}
+
+	getNotes() {
+		const url = "/notes";
+		const options = {
+			method: "GET",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			}
+		};
+
+		fetch(url, options)
+			.then(response => {
+				console.log(response);
+				return response.json();
+			})
+			.then(json => this.createMarkers(json))
+			.catch(error => console.error(error));
 	}
 
 	submitNote(position, remarks) {
@@ -166,6 +203,11 @@
 		newNote.longitude = longitude;
 
 		this.updateNote(marker, newNote);
+	}
+
+	handleMarkerClick(marker, e) {
+		this.infoWindow.setContent(`<p style="max-width:200px">${marker.note.remarks}<p>`);
+		this.infoWindow.open(this.map, marker);
 	}
 
 	handleTextChange(e) {
