@@ -1,0 +1,11 @@
+﻿@using React.AspNet
+@{
+	ViewData["Title"] = "Home";
+}
+
+<h1>Landmark Remark!</h1>
+
+<script src="@Url.Content("~/js/App.jsx")"></script>
+
+@Html.React("App", new {}, null, "app")
+@Html.ReactInitJavaScript()
