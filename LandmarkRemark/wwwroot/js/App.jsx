@@ -67,11 +67,11 @@
 				anchor: new google.maps.Point(50, 50)
 			}
 		});
+
+		this.getNotes();
 	}
 
 	createMarker(note) {
-		console.log(note);
-
 		const position = {
 			lat: note.latitude,
 			lng: note.longitude
@@ -89,6 +89,32 @@
 		google.maps.event.addListener(marker, "dragend", function (e) {
 			dragHandler(marker, e);
 		});
+	}
+
+	createMarkers(notes) {
+		for (let i = 0; i < notes.length; i++) {
+			const note = notes[i];
+			this.createMarker(note);
+		}
+	}
+
+	getNotes() {
+		const url = "/notes";
+		const options = {
+			method: "GET",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			}
+		};
+
+		fetch(url, options)
+			.then(response => {
+				console.log(response);
+				return response.json();
+			})
+			.then(json => this.createMarkers(json))
+			.catch(error => console.error(error));
 	}
 
 	submitNote(position, remarks) {
