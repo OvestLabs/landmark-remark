@@ -14,6 +14,7 @@
 		this.handleMarkerMove = this.handleMarkerMove.bind(this);
 		this.handleMarkerClick = this.handleMarkerClick.bind(this);
 		this.handleCreateNote = this.handleCreateNote.bind(this);
+		this.handleSearch = this.handleSearch.bind(this);
 	}
 
 	componentDidMount() {
@@ -108,8 +109,8 @@
 		}
 	}
 
-	getNotes() {
-		const url = "/notes";
+	getNotes(filter = "") {
+		const url = `/notes?search=${filter}`;
 		const options = {
 			method: "GET",
 			headers: {
@@ -283,11 +284,15 @@
 		});
 	}
 
+	handleSearch(filter) {
+		this.getNotes(filter);
+	}
+
 	render() {
 		return (
 			<div className="fullHeight">
 				<div className="fullHeight"></div>
-				<Menu onCreateNote={this.handleCreateNote} />
+				<Menu onCreateNote={this.handleCreateNote} onSearch={this.handleSearch} />
 			</div>
 		);
 	}
