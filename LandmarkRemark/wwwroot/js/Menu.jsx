@@ -58,6 +58,10 @@
 			remarks: this.state.remarks
 		}
 
+		this.setState({
+			remarks: ""
+		});
+
 		if (typeof this.props.onCreateNote === "function") {
 			this.props.onCreateNote(data);
 		}
