@@ -58,6 +58,7 @@
 			center: this.location,
 			zoom: 15,
 			fullscreenControl: false,
+			mapTypeControl: false
 		};
 
 		this.map = new google.maps.Map(container, options);
