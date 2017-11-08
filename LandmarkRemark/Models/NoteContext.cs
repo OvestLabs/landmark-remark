@@ -7,9 +7,9 @@ namespace LandmarkRemark.Models
 		public DbSet<User> Users { get; set; }
 		public DbSet<UserNote> Notes { get; set; }
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		public NoteContext(DbContextOptions<NoteContext> options) : base(options)
 		{
-			optionsBuilder.UseSqlite("Data Source=bin/notes.db");
+			
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
