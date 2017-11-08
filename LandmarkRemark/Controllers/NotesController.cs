@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using LandmarkRemark.Models;
@@ -25,8 +26,10 @@ namespace LandmarkRemark.Controllers
 				}
 				else
 				{
+					search = search.ToLower();
+
 					notes = await db.Notes
-						.Where(t => t.Remarks.Contains(search) || t.User.Username.Contains(search))
+						.Where(t => t.Remarks.ToLower().Contains(search) || t.User.Username.ToLower().Contains(search))
 						.Include(t => t.User)
 						.ToListAsync();
 				}
