@@ -28,10 +28,11 @@ namespace LandmarkRemark.Controllers
 		public async Task<IActionResult> Index(string username)
 		{
 			User user;
+			username = username.ToLower();
 
 			using (var db = new NoteContext())
 			{
-				user = await db.Users.SingleOrDefaultAsync(t => t.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+				user = await db.Users.SingleOrDefaultAsync(t => t.Username.ToLower() == username);
 			}
 
 			if (user == null)
