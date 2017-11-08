@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using LandmarkRemark.Models;
@@ -50,6 +49,8 @@ namespace LandmarkRemark.Controllers
 			{
 				db.Notes.Add(note);
 				await db.SaveChangesAsync();
+
+				note.User = await db.Users.SingleOrDefaultAsync(t => t.Id == note.UserId);
 			}
 
 			var link = Url.Link("UpdateNote", new { id = note.Id });
