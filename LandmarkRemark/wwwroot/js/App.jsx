@@ -56,7 +56,8 @@
 		const container = ReactDOM.findDOMNode(this).children[0];
 		const options = {
 			center: this.location,
-			zoom: 15
+			zoom: 15,
+			fullscreenControl: false,
 		};
 
 		this.map = new google.maps.Map(container, options);
