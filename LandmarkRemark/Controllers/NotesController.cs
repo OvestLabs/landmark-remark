@@ -11,15 +11,25 @@ namespace LandmarkRemark.Controllers
 	public class NotesController : Controller
 	{
 		[HttpGet]
-		public async Task<JsonResult> Index()
+		public async Task<JsonResult> Index([FromQuery] string search)
 		{
 			List<UserNote> notes;
 
 			using (var db = new NoteContext())
 			{
-				notes = await db.Notes
-					.Include(t => t.User)
-					.ToListAsync();
+				if (string.IsNullOrWhiteSpace(search))
+				{
+					notes = await db.Notes
+						.Include(t => t.User)
+						.ToListAsync();
+				}
+				else
+				{
+					notes = await db.Notes
+						.Where(t => t.Remarks.Contains(search) || t.User.Username.Contains(search))
+						.Include(t => t.User)
+						.ToListAsync();
+				}
 			}
 
 			return Json(notes);
