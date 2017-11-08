@@ -12,6 +12,8 @@ namespace LandmarkRemark.Models
 		[Range(-180, 180)]
 		public double Longitude { get; set; }
 
+		[Required]
+		[MinLength(1)]
 		public string Remarks { get; set; }
     }
 }
