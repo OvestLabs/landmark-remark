@@ -10,15 +10,19 @@ namespace LandmarkRemark.Controllers
 {
 	public sealed class UsersController : Controller
 	{
+		private readonly NoteContext _context;
+
+		public UsersController(NoteContext context)
+		{
+			context.Database.EnsureCreated();
+			_context = context;
+		}
+
+
 		[HttpGet]
 		public async Task<JsonResult> Index()
 		{
-			List<User> users;
-
-			using (var db = new NoteContext())
-			{
-				users = await db.Users.ToListAsync();
-			}
+			var users = await _context.Users.ToListAsync();
 
 			return Json(users);
 		}
@@ -27,13 +31,9 @@ namespace LandmarkRemark.Controllers
 		[Route("users/{username}", Name = "UserSearch")]
 		public async Task<IActionResult> Index(string username)
 		{
-			User user;
 			username = username.ToLower();
 
-			using (var db = new NoteContext())
-			{
-				user = await db.Users.SingleOrDefaultAsync(t => t.Username.ToLower() == username);
-			}
+			var user = await _context.Users.SingleOrDefaultAsync(t => t.Username.ToLower() == username);
 
 			if (user == null)
 			{
@@ -51,11 +51,8 @@ namespace LandmarkRemark.Controllers
 				return BadRequest(ModelState);
 			}
 
-			using (var db = new NoteContext())
-			{
-				db.Users.Add(user);
-				await db.SaveChangesAsync();
-			}
+			_context.Users.Add(user);
+			await _context.SaveChangesAsync();
 
 			var link = Url.Link("UpdateUser", new { id = user.Id });
 			var uri = new Uri(link, UriKind.Absolute);
@@ -72,19 +69,16 @@ namespace LandmarkRemark.Controllers
 				return BadRequest(ModelState);
 			}
 
-			using (var db = new NoteContext())
+			var existingUser = await _context.Users.Where(t => t.Id == id).SingleOrDefaultAsync();
+
+			if (existingUser == null)
 			{
-				var existingUser = await db.Users.Where(t => t.Id == id).SingleOrDefaultAsync();
-
-				if (existingUser == null)
-				{
-					return NotFound();
-				}
-
-				existingUser.Username = user.Username;
-
-				await db.SaveChangesAsync();
+				return NotFound();
 			}
+
+			existingUser.Username = user.Username;
+
+			await _context.SaveChangesAsync();
 
 			return NoContent();
 		}

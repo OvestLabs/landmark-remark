@@ -10,28 +10,33 @@ namespace LandmarkRemark.Controllers
 {
 	public class NotesController : Controller
 	{
+		private readonly NoteContext _context;
+
+		public NotesController(NoteContext context)
+		{
+			context.Database.EnsureCreated();
+			_context = context;
+		}
+
 		[HttpGet]
 		public async Task<JsonResult> Index([FromQuery] string search)
 		{
 			List<UserNote> notes;
 
-			using (var db = new NoteContext())
+			if (string.IsNullOrWhiteSpace(search))
 			{
-				if (string.IsNullOrWhiteSpace(search))
-				{
-					notes = await db.Notes
-						.Include(t => t.User)
-						.ToListAsync();
-				}
-				else
-				{
-					search = search.ToLower();
+				notes = await _context.Notes
+					.Include(t => t.User)
+					.ToListAsync();
+			}
+			else
+			{
+				search = search.ToLower();
 
-					notes = await db.Notes
-						.Where(t => t.Remarks.ToLower().Contains(search) || t.User.Username.ToLower().Contains(search))
-						.Include(t => t.User)
-						.ToListAsync();
-				}
+				notes = await _context.Notes
+					.Where(t => t.Remarks.ToLower().Contains(search) || t.User.Username.ToLower().Contains(search))
+					.Include(t => t.User)
+					.ToListAsync();
 			}
 
 			return Json(notes);
@@ -45,13 +50,10 @@ namespace LandmarkRemark.Controllers
 				return BadRequest(ModelState);
 			}
 
-			using (var db = new NoteContext())
-			{
-				db.Notes.Add(note);
-				await db.SaveChangesAsync();
+			_context.Notes.Add(note);
+			await _context.SaveChangesAsync();
 
-				note.User = await db.Users.SingleOrDefaultAsync(t => t.Id == note.UserId);
-			}
+			note.User = await _context.Users.SingleOrDefaultAsync(t => t.Id == note.UserId);
 
 			var link = Url.Link("UpdateNote", new { id = note.Id });
 			var uri = new Uri(link, UriKind.Absolute);
@@ -68,21 +70,18 @@ namespace LandmarkRemark.Controllers
 				return BadRequest(ModelState);
 			}
 
-			using (var db = new NoteContext())
+			var existingNote = await _context.Notes.Where(t => t.Id == id).SingleOrDefaultAsync();
+
+			if (existingNote == null)
 			{
-				var existingNote = await db.Notes.Where(t => t.Id == id).SingleOrDefaultAsync();
-
-				if (existingNote == null)
-				{
-					return NotFound();
-				}
-
-				existingNote.Latitude = note.Latitude;
-				existingNote.Longitude = note.Longitude;
-				existingNote.Remarks = note.Remarks;
-
-				await db.SaveChangesAsync();
+				return NotFound();
 			}
+
+			existingNote.Latitude = note.Latitude;
+			existingNote.Longitude = note.Longitude;
+			existingNote.Remarks = note.Remarks;
+
+			await _context.SaveChangesAsync();
 
 			return NoContent();
 		}
