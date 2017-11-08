@@ -140,7 +140,6 @@
 
 		fetch(url, options)
 			.then(response => {
-				console.log(response);
 				return response.json();
 			})
 			.then(json => this.createMarkers(json))
@@ -158,14 +157,13 @@
 			body: JSON.stringify(note)
 		};
 
-		console.log(options);
-
 		fetch(url, options)
 			.then(response => {
-				console.log(response);
-				//console.log(response.headers.get("location"));
-				//response.headers.forEach((v, k) => console.log(k, v));
-				return response.json();
+				if (response.status === 201) {
+					return response.json();
+				}
+				console.warn(response);
+				return null;
 			})
 			.then(json => this.createMarker(json))
 			.catch(error => console.error(error));
@@ -183,12 +181,16 @@
 			body: JSON.stringify(newNote)
 		};
 
-		console.log(options);
-
 		fetch(url, options)
 			.then(response => {
-				console.log(response);
-				marker.note = newNote;
+				if (response.status === 204) {
+					marker.note = newNote;
+				}
+				else {
+					console.warn(response);
+				}
+
+				return null;
 			})
 			.catch(error => console.error(error));
 	}
@@ -205,7 +207,7 @@
 
 		fetch(url, options)
 			.then(response => {
-				if (response.ok()) {
+				if (response.status === 200) {
 					return response.json();
 				}
 				return null;
