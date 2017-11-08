@@ -8,12 +8,14 @@
 
 		const melbourne = { lat: -37.811263, lng: 144.963151 };
 		this.location = melbourne;
+		this.markers = [];
 
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleLocationError = this.handleLocationError.bind(this);
 		this.handleMarkerMove = this.handleMarkerMove.bind(this);
 		this.handleMarkerClick = this.handleMarkerClick.bind(this);
 		this.handleCreateNote = this.handleCreateNote.bind(this);
+		this.handleSearch = this.handleSearch.bind(this);
 	}
 
 	componentDidMount() {
@@ -97,6 +99,8 @@
 		google.maps.event.addListener(marker, "click", function(e) {
 			clickHandler(marker, e);
 		});
+
+		this.markers.push(marker);
 	}
 
 	createMarkers(notes) {
@@ -108,8 +112,18 @@
 		}
 	}
 
-	getNotes() {
-		const url = "/notes";
+	clearMarkers() {
+		const markers = this.markers;
+
+		for (let i = 0; i < markers.length; i++) {
+			markers[i].setMap(null);
+		}
+
+		markers.length = 0;
+	}
+
+	getNotes(filter = "") {
+		const url = `/notes?search=${filter}`;
 		const options = {
 			method: "GET",
 			headers: {
@@ -117,6 +131,8 @@
 				"Content-Type": "application/json"
 			}
 		};
+
+		this.clearMarkers();
 
 		fetch(url, options)
 			.then(response => {
@@ -283,11 +299,15 @@
 		});
 	}
 
+	handleSearch(filter) {
+		this.getNotes(filter);
+	}
+
 	render() {
 		return (
 			<div className="fullHeight">
 				<div className="fullHeight"></div>
-				<Menu onCreateNote={this.handleCreateNote} />
+				<Menu onCreateNote={this.handleCreateNote} onSearch={this.handleSearch} />
 			</div>
 		);
 	}

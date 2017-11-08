@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using LandmarkRemark.Models;
@@ -11,15 +12,27 @@ namespace LandmarkRemark.Controllers
 	public class NotesController : Controller
 	{
 		[HttpGet]
-		public async Task<JsonResult> Index()
+		public async Task<JsonResult> Index([FromQuery] string search)
 		{
 			List<UserNote> notes;
 
 			using (var db = new NoteContext())
 			{
-				notes = await db.Notes
-					.Include(t => t.User)
-					.ToListAsync();
+				if (string.IsNullOrWhiteSpace(search))
+				{
+					notes = await db.Notes
+						.Include(t => t.User)
+						.ToListAsync();
+				}
+				else
+				{
+					search = search.ToLower();
+
+					notes = await db.Notes
+						.Where(t => t.Remarks.ToLower().Contains(search) || t.User.Username.ToLower().Contains(search))
+						.Include(t => t.User)
+						.ToListAsync();
+				}
 			}
 
 			return Json(notes);
