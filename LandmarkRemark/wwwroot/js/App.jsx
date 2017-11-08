@@ -9,12 +9,11 @@
 		const melbourne = { lat: -37.811263, lng: 144.963151 };
 		this.location = melbourne;
 
-		this.handleTextChange = this.handleTextChange.bind(this);
-		this.handleKeyUp = this.handleKeyUp.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleLocationError = this.handleLocationError.bind(this);
 		this.handleMarkerMove = this.handleMarkerMove.bind(this);
 		this.handleMarkerClick = this.handleMarkerClick.bind(this);
+		this.handleCreateNote = this.handleCreateNote.bind(this);
 	}
 
 	componentDidMount() {
@@ -128,21 +127,15 @@
 			.catch(error => console.error(error));
 	}
 
-	submitNote(position, remarks) {
+	submitNote(note) {
 		const url = "/notes";
-		const payload = {
-			latitude: position.lat,
-			longitude: position.lng,
-			remarks: remarks
-		};
-
 		const options = {
 			method: "POST",
 			headers: {
 				Accept: "application/json, text/plain, */*",
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify(payload)
+			body: JSON.stringify(note)
 		};
 
 		console.log(options);
@@ -180,6 +173,53 @@
 			.catch(error => console.error(error));
 	}
 
+	getUser(username, callback) {
+		const url = `/users/${username}`;
+		const options = {
+			method: "GET",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			}
+		};
+
+		fetch(url, options)
+			.then(response => {
+				if (response.ok()) {
+					return response.json();
+				}
+				return null;
+			})
+			.then(callback)
+			.catch(error => callback(null));
+	}
+
+	createUser(username, callback) {
+		const url = "/users";
+		const user = {
+			username: username
+		};
+		const options = {
+			method: "POST",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(user)
+		};
+
+		fetch(url, options)
+			.then(response => {
+				if (response.status === 201) {
+					return response.json();
+				}
+
+				return null;
+			})
+			.then(callback)
+			.catch(error => console.error(error));
+	}
+
 	handleLocationChange(location) {
 		this.location = {
 			lat: location.coords.latitude,
@@ -206,40 +246,48 @@
 	}
 
 	handleMarkerClick(marker, e) {
-		this.infoWindow.setContent(`<p style="max-width:200px">${marker.note.remarks}<p>`);
+		const username = marker.note.user.username;
+		const remarks = marker.note.remarks;
+		const content = `<p style="max-width:200px"><strong>${username}</strong>:<br/>${remarks}<p>`;
+
+		this.infoWindow.setContent(content);
 		this.infoWindow.open(this.map, marker);
 	}
 
-	handleTextChange(e) {
-		const newText = e.currentTarget.value;
+	handleCreateNote(note) {
+		this.getUser(note.username, (existingUser) => {
+			if (existingUser == null) {
+				this.createUser(
+					note.username,
+					(newUser) => {
+						const newNote = {
+							userId: newUser.id,
+							latitude: this.location.lat,
+							longitude: this.location.lng,
+							remarks: note.remarks
+						};
 
-		this.setState({
-			text: newText
+						this.submitNote(newNote);
+					});
+			}
+			else {
+				const newNote = {
+					userId: existingUser.id,
+					latitude: this.location.lat,
+					longitude: this.location.lng,
+					remarks: note.remarks
+				};
+
+				this.submitNote(newNote);
+			}
 		});
-	}
-
-	handleKeyUp(e) {
-		if (e.key !== "Enter") {
-			return;
-		}
-
-		e.currentTarget.blur();
-
-		this.submitNote(this.location, this.state.text);
 	}
 
 	render() {
 		return (
 			<div className="fullHeight">
 				<div className="fullHeight"></div>
-				<div className="menu">
-					<input
-						type="text"
-						value={this.state.text}
-						onChange={this.handleTextChange}
-						onKeyUp={this.handleKeyUp}
-						placeholder="enter note here..." />
-				</div>
+				<Menu onCreateNote={this.handleCreateNote} />
 			</div>
 		);
 	}

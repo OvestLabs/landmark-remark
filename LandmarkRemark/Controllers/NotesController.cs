@@ -17,7 +17,9 @@ namespace LandmarkRemark.Controllers
 
 			using (var db = new NoteContext())
 			{
-				notes = await db.Notes.ToListAsync();
+				notes = await db.Notes
+					.Include(t => t.User)
+					.ToListAsync();
 			}
 
 			return Json(notes);
