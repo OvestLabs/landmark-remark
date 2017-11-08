@@ -246,7 +246,11 @@
 	}
 
 	handleMarkerClick(marker, e) {
-		this.infoWindow.setContent(`<p style="max-width:200px">${marker.note.remarks}<p>`);
+		const username = marker.note.user.username;
+		const remarks = marker.note.remarks;
+		const content = `<p style="max-width:200px"><strong>${username}</strong>:<br/>${remarks}<p>`;
+
+		this.infoWindow.setContent(content);
 		this.infoWindow.open(this.map, marker);
 	}
 
