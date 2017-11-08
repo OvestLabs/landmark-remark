@@ -173,6 +173,53 @@
 			.catch(error => console.error(error));
 	}
 
+	getUser(username, callback) {
+		const url = `/users/${username}`;
+		const options = {
+			method: "GET",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			}
+		};
+
+		fetch(url, options)
+			.then(response => {
+				if (response.ok()) {
+					return response.json();
+				}
+				return null;
+			})
+			.then(callback)
+			.catch(error => callback(null));
+	}
+
+	createUser(username, callback) {
+		const url = "/users";
+		const user = {
+			username: username
+		};
+		const options = {
+			method: "POST",
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(user)
+		};
+
+		fetch(url, options)
+			.then(response => {
+				if (response.status === 201) {
+					return response.json();
+				}
+
+				return null;
+			})
+			.then(callback)
+			.catch(error => console.error(error));
+	}
+
 	handleLocationChange(location) {
 		this.location = {
 			lat: location.coords.latitude,
@@ -204,10 +251,32 @@
 	}
 
 	handleCreateNote(note) {
-		note.latitude = this.location.lat;
-		note.longitude = this.location.lng;
+		this.getUser(note.username, (existingUser) => {
+			if (existingUser == null) {
+				this.createUser(
+					note.username,
+					(newUser) => {
+						const newNote = {
+							userId: newUser.id,
+							latitude: this.location.lat,
+							longitude: this.location.lng,
+							remarks: note.remarks
+						};
 
-		this.submitNote(note);
+						this.submitNote(newNote);
+					});
+			}
+			else {
+				const newNote = {
+					userId: existingUser.id,
+					latitude: this.location.lat,
+					longitude: this.location.lng,
+					remarks: note.remarks
+				};
+
+				this.submitNote(newNote);
+			}
+		});
 	}
 
 	render() {

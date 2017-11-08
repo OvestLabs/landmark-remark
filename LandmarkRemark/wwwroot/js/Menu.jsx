@@ -3,18 +3,28 @@
 		super(props);
 
 		this.state = {
-			text: ""
+			username: "",
+			remarks: ""
 		};
 
-		this.handleTextChange = this.handleTextChange.bind(this);
+		this.handleUsernameChange = this.handleUsernameChange.bind(this);
+		this.handleRemarkChange = this.handleRemarkChange.bind(this);
 		this.handleKeyUp = this.handleKeyUp.bind(this);
 	}
 
-	handleTextChange(e) {
-		const newText = e.currentTarget.value;
+	handleUsernameChange(e) {
+		const newValue = e.currentTarget.value;
 
 		this.setState({
-			text: newText
+			username: newValue
+		});
+	}
+
+	handleRemarkChange(e) {
+		const newValue = e.currentTarget.value;
+
+		this.setState({
+			remarks: newValue
 		});
 	}
 
@@ -23,14 +33,22 @@
 			return;
 		}
 
+		const username = this.state.username.trim();
+		const remarks = this.state.remarks.trim();
+
+		if (username === "" || remarks === "") {
+			return;
+		}
+
 		e.currentTarget.blur();
 
-		const note = {
-			remarks: this.state.text
+		const data = {
+			username: this.state.username,
+			remarks: this.state.remarks
 		}
 
 		if (typeof this.props.onCreateNote === "function") {
-			this.props.onCreateNote(note);
+			this.props.onCreateNote(data);
 		}
 	}
 
@@ -39,10 +57,16 @@
 			<div className="menu">
 				<input
 					type="text"
-					value={this.state.text}
-					onChange={this.handleTextChange}
+					value={this.state.username}
+					onChange={this.handleUsernameChange}
 					onKeyUp={this.handleKeyUp}
-					placeholder="enter note here..." />
+					placeholder="username..." />
+				<input
+					type="text"
+					value={this.state.remarks}
+					onChange={this.handleRemarkChange}
+					onKeyUp={this.handleKeyUp}
+					placeholder="remarks..." />
 			</div>
 		);
 	}
