@@ -309,7 +309,8 @@
 		return (
 			<div className="fullHeight">
 				<div className="fullHeight"></div>
-				<Menu onCreateNote={this.handleCreateNote} onSearch={this.handleSearch} />
+				<Search onSearch={this.handleSearch}/>
+				<Menu onCreateNote={this.handleCreateNote} />
 			</div>
 		);
 	}
