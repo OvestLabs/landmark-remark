@@ -25,10 +25,6 @@
 
 		const text = this.state.text.trim();
 
-		if (text === "") {
-			return;
-		}
-
 		e.currentTarget.blur();
 
 		if (typeof this.props.onSearch === "function") {
