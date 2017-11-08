@@ -8,6 +8,7 @@
 
 		const melbourne = { lat: -37.811263, lng: 144.963151 };
 		this.location = melbourne;
+		this.markers = [];
 
 		this.handleLocationChange = this.handleLocationChange.bind(this);
 		this.handleLocationError = this.handleLocationError.bind(this);
@@ -98,6 +99,8 @@
 		google.maps.event.addListener(marker, "click", function(e) {
 			clickHandler(marker, e);
 		});
+
+		this.markers.push(marker);
 	}
 
 	createMarkers(notes) {
@@ -109,6 +112,16 @@
 		}
 	}
 
+	clearMarkers() {
+		const markers = this.markers;
+
+		for (let i = 0; i < markers.length; i++) {
+			markers[i].setMap(null);
+		}
+
+		markers.length = 0;
+	}
+
 	getNotes(filter = "") {
 		const url = `/notes?search=${filter}`;
 		const options = {
@@ -118,6 +131,8 @@
 				"Content-Type": "application/json"
 			}
 		};
+
+		this.clearMarkers();
 
 		fetch(url, options)
 			.then(response => {
