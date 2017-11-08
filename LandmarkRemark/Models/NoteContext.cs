@@ -11,5 +11,13 @@ namespace LandmarkRemark.Models
 		{
 			optionsBuilder.UseSqlite("Data Source=bin/notes.db");
 		}
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder
+				.Entity<User>()
+				.HasAlternateKey(t => t.Username)
+				.HasName("Unique_Username");
+		}
 	}
 }
