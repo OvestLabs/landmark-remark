@@ -38,7 +38,7 @@
 
 	render() {
 		return (
-			<div className="search">
+			<div className="search centered-content">
 				<input
 					type="text"
 					value={this.state.text}
