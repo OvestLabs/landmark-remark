@@ -59,7 +59,8 @@
 			zoom: 15,
 			fullscreenControl: false,
 			mapTypeControl: false,
-			streetViewControl: false
+			streetViewControl: false,
+			zoomControl: false
 		};
 
 		this.map = new google.maps.Map(container, options);
@@ -311,7 +312,7 @@
 			<div className="fullHeight">
 				<div className="fullHeight"></div>
 				<Search onSearch={this.handleSearch}/>
-				<Menu onCreateNote={this.handleCreateNote} />
+				<NoteForm onCreateNote={this.handleCreateNote} />
 			</div>
 		);
 	}

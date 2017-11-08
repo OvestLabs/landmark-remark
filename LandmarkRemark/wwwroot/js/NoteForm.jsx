@@ -1,4 +1,4 @@
-﻿class Menu extends React.Component {
+﻿class NoteForm extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -58,24 +58,25 @@
 
 	render() {
 		return (
-			<div className="menu">
+			<div className="note-form centered-content">
 				<input
+					className="username"
 					type="text"
 					value={this.state.username}
 					onChange={this.handleUsernameChange}
 					onKeyUp={this.handleKeyUp}
-					placeholder="username..." />
+					placeholder="Your username" />
 				<input
 					type="text"
 					value={this.state.remarks}
 					onChange={this.handleRemarkChange}
 					onKeyUp={this.handleKeyUp}
-					placeholder="remarks..." />
+					placeholder="Location remarks..." />
 			</div>
 		);
 	}
 };
 
-Menu.defaultProps = {
+NoteForm.defaultProps = {
 	onCreateNote: function () { },
 };
