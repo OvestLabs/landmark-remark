@@ -7,6 +7,23 @@ html, body {
 	height: 100%;
 }
 
+input:focus,
+button:focus {
+	outline-width: 0;
+	outline: none;
+}
+
+input[type="text"] {
+	border: none;
+	font-size: 21px;
+	color: #666;
+	min-width: 100px;
+}
+
+input::placeholder {
+	color: #CCC;
+}
+
 .fullHeight {
 	height: 100%;
 }
@@ -15,11 +32,56 @@ html, body {
 	position: relative;
 }
 
-.menu {
-	position: absolute;
+.centered-content {
+	max-width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.search {
 	width: 80%;
-	bottom: 20px;
+	position: absolute;
+	top: 20px;
+	left: 0;
+	right: 0;
+	z-index: 99;
+	background-color: rgba(255, 255, 255, .95);
+	border: 1px solid white;
+	border-radius: 5px;
+	padding: 8px 8px;
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: flex-start;
+	align-items: center;
 }
+
+	.search input {
+		flex: 1 100%;
+		padding: 0 8px 0 32px;
+		background: url('/assets/magnifying-glass.svg') no-repeat center left;
+		background-size: 18px 18px;
+	}
+
+.note-form {
+	width: 80%;
+	position: absolute;
+	bottom: 20px;
+	left: 0;
+	right: 0;
+	z-index: 99;
+	background-color: rgba(255, 255, 255, .95);
+	border: 1px solid white;
+	border-radius: 5px;
+	padding: 2px 8px;
+	display: flex;
+	flex-direction: column;
+}
+
+	.note-form input {
+		padding: 8px 0;
+	}
+
+	.note-form .username {
+		border-bottom: 1px solid #EDEDED !important;
+	}
+

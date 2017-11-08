@@ -56,7 +56,11 @@
 		const container = ReactDOM.findDOMNode(this).children[0];
 		const options = {
 			center: this.location,
-			zoom: 15
+			zoom: 15,
+			fullscreenControl: false,
+			mapTypeControl: false,
+			streetViewControl: false,
+			zoomControl: false
 		};
 
 		this.map = new google.maps.Map(container, options);
@@ -307,7 +311,8 @@
 		return (
 			<div className="fullHeight">
 				<div className="fullHeight"></div>
-				<Menu onCreateNote={this.handleCreateNote} onSearch={this.handleSearch} />
+				<Search onSearch={this.handleSearch}/>
+				<NoteForm onCreateNote={this.handleCreateNote} />
 			</div>
 		);
 	}
